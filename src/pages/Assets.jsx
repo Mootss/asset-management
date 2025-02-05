@@ -2,9 +2,11 @@ import AssetsTable from "../components/AssetsTable/AssetsTable"
 import AssetsRow from "../components/AssetsTable/AssetsRow"
 import { useEffect, useState } from "react"
 
+const apiURL = "https://moothy.pythonanywhere.com"
+
 async function fetchAssets(setAssetsData, setLoading) {
     try {
-        const response = await fetch("http://127.0.0.1:5000/assets")
+        const response = await fetch(`${apiURL}/assets`)
 
         if (!response.ok) {
             console.log(response)

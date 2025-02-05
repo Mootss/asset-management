@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react"
 import StaffCollapse from "../components/Collapse/StaffCollapse"
 
+const apiURL = "https://moothy.pythonanywhere.com"
+
 async function fetchStaff(setStaffData, setLoading) {
     try {
-        const response = await fetch("http://127.0.0.1:5000/staff")
+        const response = await fetch(`${apiURL}/staff`)
 
         if (!response.ok) {
             console.log(response)

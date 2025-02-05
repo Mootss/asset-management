@@ -4,7 +4,7 @@ import StaffAssetsTable from "./StaffAssetsTable"
 import StaffAssetsRow from "./StaffAssetsRow"
 import { useEffect, useState } from "react"
 
-const apiURL = "http://127.0.0.1:5000"
+const apiURL = "https://moothy.pythonanywhere.com"
 
 async function fetchStaffCurrent(setAssignedAssets, staffID) {
     try {
