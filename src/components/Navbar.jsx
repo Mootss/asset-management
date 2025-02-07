@@ -1,15 +1,19 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faComputer, faUsers } from "@fortawesome/free-solid-svg-icons"
 
 export default function Navbar({ children }) {
+    const location = useLocation()
+
     return (
         <>
             <div className="drawer">
-                <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
+                <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
                 <div className="drawer-content flex flex-col">
                     {/* Navbar */}
                     <div className="navbar shadow-md w-full">
                         <div className="flex-none sm:hidden">
-                            <label htmlFor="my-drawer-3" aria-label="open sidebar" className="btn btn-square btn-ghost">
+                            <label htmlFor="nav-drawer" aria-label="open sidebar" className="btn btn-square btn-ghost">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -33,15 +37,23 @@ export default function Navbar({ children }) {
                         <div className="hidden flex-none sm:block">
                             <ul className="menu menu-horizontal">
                                 {/* Navbar */}
-                                <li><Link to="/staff">Staff</Link></li>
-                                <li><Link to="/assets">Assets</Link></li>
+                                <li className={location.pathname === "/staff" ? "bg-gray-200 rounded-lg mx-1" : "mx-1"} >
+                                    <Link to="/staff">
+                                        <FontAwesomeIcon icon={faUsers} />Staff
+                                    </Link>
+                                </li>
+                                <li className={location.pathname === "/assets" ? "bg-gray-200 rounded-lg mx-1" : "mx-1"}>
+                                    <Link to="/assets">
+                                    <FontAwesomeIcon icon={faComputer} />Assets
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
                     </div>
-                    { children }
+                    {children}
                 </div>
                 <div className="drawer-side">
-                    <label htmlFor="my-drawer-3" aria-label="close sidebar" className="drawer-overlay"></label>
+                    <label htmlFor="nav-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
                     <ul className="menu bg-base-200 min-h-full w-80 p-4">
                         {/* Sidebar */}
                         <li><Link to="/staff">Staff</Link></li>

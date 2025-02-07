@@ -2,34 +2,47 @@ import Collapse from "./Collapse"
 import CollapseHeader from "./CollapseHeader"
 import StaffAssetsTable from "./StaffAssetsTable"
 import StaffAssetsRow from "./StaffAssetsRow"
-import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { fetchAPI } from "../../utils/API"
 
-const apiURL = "https://moothy.pythonanywhere.com"
+// const apiURL = "https://moothy.pythonanywhere.com"
 
-async function fetchStaffCurrent(setAssignedAssets, staffID) {
-    try {
-        const response = await fetch(`${apiURL}/staff/${staffID}/current`)
+// async function fetchStaffCurrent(setAssignedAssets, staffID) {
+//     try {
+//         const response = await fetch(`${apiURL}/staff/${staffID}/current`)
 
-        if (!response.ok) {
-            console.log(response)
-            throw new Error("Error fetching staff current data")
-        } else {
-            const assigned = await response.json()
-            // console.log(assigned)
-            setAssignedAssets(assigned)
-        }
+//         if (!response.ok) {
+//             console.log(response)
+//             throw new Error("Error fetching staff current data")
+//         } else {
+//             const assigned = await response.json()
+//             // console.log(assigned)
+//             setAssignedAssets(assigned)
+//         }
 
-    } catch (error) {
-        console.error(error)
-    }
-}
+//     } catch (error) {
+//         console.error(error)
+//     }
+// }
 
 export default function StaffCollapse({ staff }) {
-    const [assignedAssets, setAssignedAssets] = useState([])
+    const { isLoading, data: assignedAssets, isError, error, isFetching } = useQuery({
+        queryKey: ["assignedAssets", staff.national_id],
+        queryFn: () => fetchAPI({
+            url: `/staff/${staff.national_id}/current`
+        }),
+        staleTime: 1000 * 60 * 15
+    })
 
-    useEffect(() => {
-        fetchStaffCurrent(setAssignedAssets, staff.national_id)
-    }, [staff.national_id])
+    // const [assignedAssets, setAssignedAssets] = useState([])
+
+    // useEffect(() => {
+    //     fetchStaffCurrent(setAssignedAssets, staff.national_id)
+    // }, [staff.national_id])
+
+    if (isError) {
+        return <h1>ERROR FETCHING DATA: {error.message}</h1>
+    }
 
     return (
         <>
@@ -45,22 +58,28 @@ export default function StaffCollapse({ staff }) {
                 }
 
                 content={
-                    assignedAssets.length === 0 ? (<h1>• No assets currently assigned</h1>) : (
-                        <StaffAssetsTable>
-                            {assignedAssets.map((asset, index) => (
-                                <StaffAssetsRow
-                                    key={index}
-                                    no={index + 1}
-                                    asset={asset.type}
-                                    status={asset.status}
-                                    location={asset.location}
-                                    purchasedDate={new Date(asset.purchased_date).toLocaleDateString("en-GB")}
-                                    assignedDate={new Date(asset.assigned_date).toLocaleDateString("en-GB")}
-                                />
-                            ))}
+                    isLoading ? (
+                        <div className="flex justify-center items-center mt-6">
+                            <span className="loading loading-spinner loading-lg"></span>
+                        </div>
+                    ) : (isLoading === false && assignedAssets.length === 0)
+                        ? (<h1>• No assets currently assigned</h1>)
+                        : (
+                            <StaffAssetsTable>
+                                {assignedAssets.map((asset, index) => (
+                                    <StaffAssetsRow
+                                        key={index}
+                                        no={index + 1}
+                                        asset={asset.type}
+                                        status={asset.status}
+                                        location={asset.location}
+                                        purchasedDate={new Date(asset.purchased_date).toLocaleDateString("en-GB")}
+                                        assignedDate={new Date(asset.assigned_date).toLocaleDateString("en-GB")}
+                                    />
+                                ))}
 
-                        </StaffAssetsTable>
-                    )
+                            </StaffAssetsTable>
+                        )
                 }
             />
         </>
