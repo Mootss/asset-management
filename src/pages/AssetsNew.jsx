@@ -1,5 +1,5 @@
 import Card from "../components/Card"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
 import Label from "../components/Label"
@@ -16,29 +16,49 @@ export default function AssetsNew() {
         staleTime: 1000 * 60 * 15
     })
 
+    const navigate = useNavigate()
+
     const [type, setType] = useState("")
     const [purchasedDate, setPurchasedDate] = useState("")
-    const [status, setStatus] = useState("not-assigned")
+    const [status, setStatus] = useState("Not Assigned")
     const [assignedDate, setAssignedDate] = useState("")
-    const [staff, setStaff] = useState("")
+    const [assignedStaff, setAssignedStaff] = useState("")
     const [location, setLocation] = useState("")
     const [discardedDate, setDiscardedDate] = useState("")
+
+    const [loading, setLoading] = useState(false)
     //const [lastReturnedDate, setLastReturnedDate] = useState("")
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault()
+        setLoading(true)
         const data = {
             type,
             purchasedDate,
             status,
             assignedDate,
-            staff
+            assignedStaff,
+            location,
+            discardedDate,
         }
 
-        // fetchAPI({
-        //     url: "/asset/create"
-        // })
+        const res = await fetchAPI({
+            url: "/assets/create",
+            method: "post",
+            body: data,
+        })
+        
+        if (res.success === true) {
+            // success/fail popup here
+            console.log(1)
+        }
+
+        navigate("/assets")
+        setLoading(false)
         console.log(data)
+        console.log(res)
+
+        // do sth with res
     }
 
     if (isError) {
@@ -93,19 +113,19 @@ export default function AssetsNew() {
                                     onChange={e => { setStatus(e.target.value) }}
                                     className="select select-bordered w-full max-w-xs"
                                 >
-                                    <option value="not-assigned">Not Assigned</option>
-                                    <option value="assigned">Assigned</option>
-                                    <option value="discarded">Discarded</option>
+                                    <option value="Not Assigned">Not Assigned</option>
+                                    <option value="Assigned">Assigned</option>
+                                    <option value="Discarded">Discarded</option>
                                 </select>
                             </Label>
 
-                            {status === "assigned" && (
+                            {status === "Assigned" && (
                                 <>
                                     <Label name="Select assigned staff">
                                         <select
                                             required
-                                            value={staff}
-                                            onChange={e => { setStaff(e.target.value) }}
+                                            value={assignedStaff}
+                                            onChange={e => { setAssignedStaff(e.target.value) }}
                                             className="select select-bordered w-full max-w-xs"
                                         >
                                             <option value="" disabled>
@@ -142,10 +162,8 @@ export default function AssetsNew() {
                                 </>
                             )}
 
-                            {status === "assigned" && (
+                            {status === "discarded" && (
                                 <>
-                                  
-
                                     <Label name="Discarded date">
                                         <input
                                             type="date"
@@ -155,18 +173,27 @@ export default function AssetsNew() {
                                             className="input input-bordered"
                                         />
                                     </Label>
-
                                 </>
                             )}
 
-                            <button type="submit" className="btn btn-neutral mt-4 hover:shadow-md hover:text-white">
-                                Add asset
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="btn btn-neutral mt-4 hover:shadow-md hover:text-white"
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                        Add asset
+                                    </>
+                                ) : (
+                                    <>Add asset</>
+                                )}
                             </button>
                         </form>
                     </>
                 )}
             </Card>
-            <p>this page is incomplete</p>
         </>
     )
 }

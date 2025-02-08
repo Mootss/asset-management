@@ -11,8 +11,8 @@ export default function Assets() {
     const { isLoading, data: assetsData, isError, error, isFetching } = useQuery({
         queryKey: ["assets"],
         queryFn: () => fetchAPI({
-                    url: "/assets"
-                }),
+            url: "/assets"
+        }),
         //staleTime: 6969
     })
 
@@ -25,7 +25,7 @@ export default function Assets() {
 
     return (
         <>
-            {isFetching && ( <SyncPopup /> )}
+            {isFetching && (<SyncPopup />)}
 
             <Card>
 
@@ -75,6 +75,7 @@ export default function Assets() {
                 )}
 
             </Card>
+            <p>this page is incomplete</p>
         </>
     )
 }

@@ -12,6 +12,7 @@ export async function fetchAPI({ url, method, body }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
             })
+            return response.json()
 
         } else {
             const response = await fetch(`${apiURL}${url}`)
