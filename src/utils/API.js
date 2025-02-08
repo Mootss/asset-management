@@ -1,6 +1,6 @@
 let apiURL = "https://moothy.pythonanywhere.com"
 
-const dev = true
+const dev = false
 
 if (dev === true) { apiURL = "http://127.0.0.1:5000" }
 
