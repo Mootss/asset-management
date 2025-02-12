@@ -5,7 +5,7 @@ A demo site for Haafai practical assessment
 
 Live preview: https://haafai-demo.vercel.app/
 
-site is not yet fully functional (editing assets, asset assignment history)
+missing: asset assignment history
 
 
 ## Stack

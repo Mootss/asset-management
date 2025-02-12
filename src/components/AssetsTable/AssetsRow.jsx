@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function StaffAssetsRow({
     no,
     type,
@@ -7,7 +9,8 @@ export default function StaffAssetsRow({
     location,
     assignedDate,
     discardedDate,
-    lastReturnedDate }) {
+    lastReturnedDate,
+    assetID }) {
 
     let statusColor
     if (status === "Assigned") {
@@ -34,10 +37,13 @@ export default function StaffAssetsRow({
                 <td>{assignedDate}</td>
                 <td>{discardedDate}</td>
                 <td>{lastReturnedDate}</td>
+
                 <td>
-                    <button className="btn btn-outline btn-sm shadow">
-                        Edit
-                    </button>
+                    <Link to={`/assets/edit/${assetID}`}>
+                        <button className="btn btn-outline btn-sm shadow">
+                            Edit
+                        </button>
+                    </Link>
                 </td>
             </tr>
         </>

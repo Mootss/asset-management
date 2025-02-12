@@ -1,33 +1,94 @@
 import Card from "../components/Card"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
 import Label from "../components/Label"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { fetchAPI } from "../utils/API"
+import { convertDate } from "../utils/general"
 
-export default function AssetsNew() {
-    const { isLoading, data: staffData, isError, error } = useQuery({
+export default function AssetsEdit() {
+    const staff = useQuery({
         queryKey: ["staff"],
         queryFn: () => fetchAPI({
             url: "/staff"
         }),
-        staleTime: 1000 * 60 * 15
+        staleTime: Infinity
+    })
+
+    const { id } = useParams()
+
+    const asset = useQuery({
+        queryKey: ["asset", id],
+        queryFn: () => fetchAPI({
+            url: `/assets/${id}`
+        })
     })
 
     const navigate = useNavigate()
+    const [assetCurrentData, setAssetCurrentData] = useState(null)
+    const [isAssetDataSame, setIsAssetDataSame] = useState(true)
 
     const [type, setType] = useState("")
     const [purchasedDate, setPurchasedDate] = useState("")
-    const [status, setStatus] = useState("Not Assigned")
+    const [status, setStatus] = useState("")
     const [assignedDate, setAssignedDate] = useState("")
     const [assignedStaff, setAssignedStaff] = useState("")
     const [location, setLocation] = useState("")
     const [discardedDate, setDiscardedDate] = useState("")
+    const [lastReturnedDate, setLastReturnedDate] = useState("")
 
-    const [loading, setLoading] = useState(false)
-    //const [lastReturnedDate, setLastReturnedDate] = useState("")
+    const [loading, setLoading] = useState(false) // submit loading
+
+    useEffect(() => {
+        if (asset.data) {
+            const assetData = {
+                type: asset.data[0].type,
+                purchasedDate: asset.data[0].purchased_date,
+                status: asset.data[0].status,
+                assignedDate: asset.data[0].assigned_date,
+                assignedStaff: asset.data[0].assigned_staff,
+                location: asset.data[0].location,
+                discardedDate: asset.data[0].discarded_date,
+                lastReturnedDate: asset.data[0].last_returned_date
+            }
+
+            setAssetCurrentData(assetData)
+
+            setType(assetData.type)
+            setPurchasedDate(convertDate(assetData.purchasedDate))
+            setStatus(assetData.status)
+            
+            setAssignedDate(convertDate(assetData.assignedDate))
+
+            setAssignedStaff(assetData.assignedStaff)
+
+            setLocation(assetData.location)
+            setDiscardedDate(convertDate(assetData.discardedDate))
+            setLastReturnedDate(convertDate(assetData.lastReturnedDate))
+        }
+    }, [asset.data])
+
+    useEffect(() => { // check if form has been edited, if edited let user click btn
+        if (assetCurrentData) {
+            switch (true) {
+                case assetCurrentData.type !== type:
+                case convertDate(assetCurrentData.purchasedDate) !== purchasedDate:
+                case assetCurrentData.status !== status:
+                case convertDate(assetCurrentData.assignedDate) !== assignedDate:
+                case assetCurrentData.assignedStaff !== assignedStaff:
+                case assetCurrentData.location !== location:
+                case convertDate(assetCurrentData.discardedDate) !== discardedDate:
+                    setIsAssetDataSame(false)
+                    break
+
+                default:
+                    setIsAssetDataSame(true)
+            }
+        }
+
+    }, [type, purchasedDate, status, assignedDate, assignedStaff, location, discardedDate])
 
     const handleSubmit = async e => {
         e.preventDefault()
@@ -43,11 +104,11 @@ export default function AssetsNew() {
         }
 
         const res = await fetchAPI({
-            url: "/assets/create",
+            url: `/assets/edit/${id}`,
             method: "post",
             body: data,
         })
-        
+
         if (res.success === true) {
             // success/fail popup here
             console.log(1)
@@ -61,14 +122,14 @@ export default function AssetsNew() {
         // do sth with res
     }
 
-    if (isError) {
-        return <h1>ERROR FETCHING DATA: {error.message}</h1>
+    if (staff.isError) {
+        return <h1>ERROR FETCHING DATA: {staff.error.message}</h1>
     }
 
     return (
         <>
             <Card>
-                {isLoading ? (
+                {(staff.isLoading || asset.isLoading) ? (
                     <div className="flex justify-center items-center my-12">
                         <span className="loading loading-spinner loading-lg"></span>
                     </div>
@@ -76,7 +137,7 @@ export default function AssetsNew() {
                     <>
                         <div className="flex justify-between m-4 mb-6">
                             <h1 className="font-bold text-2xl underline underline-offset-8">
-                                New Asset
+                                Edit Asset
                             </h1>
                             <Link to="/assets">
                                 <FontAwesomeIcon icon={faXmark} className="text-3xl" />
@@ -131,7 +192,7 @@ export default function AssetsNew() {
                                             <option value="1" disabled>
                                                 -- Select a staff --
                                             </option>
-                                            {staffData.map(staff => (
+                                            {staff.data.map(staff => (
                                                 <option key={staff.national_id} value={staff.national_id}>
                                                     {staff.national_id} ({staff.name})
                                                 </option>
@@ -162,7 +223,7 @@ export default function AssetsNew() {
                                 </>
                             )}
 
-                            {status === "discarded" && (
+                            {status === "Discarded" && (
                                 <>
                                     <Label name="Discarded date">
                                         <input
@@ -178,16 +239,16 @@ export default function AssetsNew() {
 
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={isAssetDataSame || loading}
                                 className="btn btn-neutral mt-4 hover:shadow-md hover:text-white"
                             >
                                 {loading ? (
                                     <>
                                         <span className="loading loading-spinner loading-sm"></span>
-                                        Add asset
+                                        Save changes
                                     </>
                                 ) : (
-                                    <>Add asset</>
+                                    <>Save changes</>
                                 )}
                             </button>
                         </form>

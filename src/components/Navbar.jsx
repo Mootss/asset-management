@@ -1,19 +1,25 @@
 import { Link, useLocation } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faComputer, faUsers } from "@fortawesome/free-solid-svg-icons"
+import { useState } from "react"
 
 export default function Navbar({ children }) {
     const location = useLocation()
+    const [isChecked, setIsChecked] = useState(false)
+
+    function toggleDrawer() {
+        setIsChecked(!isChecked)
+    }
 
     return (
         <>
             <div className="drawer">
-                <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
+                <input id="nav-drawer" type="checkbox" className="drawer-toggle" checked={isChecked} />
                 <div className="drawer-content flex flex-col">
                     {/* Navbar */}
                     <div className="navbar shadow-md w-full">
                         <div className="flex-none sm:hidden">
-                            <label htmlFor="nav-drawer" aria-label="open sidebar" className="btn btn-square btn-ghost">
+                            <label htmlFor="nav-drawer" onClick={setIsChecked} aria-label="open sidebar" className="btn btn-square btn-ghost">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -53,11 +59,11 @@ export default function Navbar({ children }) {
                     {children}
                 </div>
                 <div className="drawer-side">
-                    <label htmlFor="nav-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
+                    <label htmlFor="nav-drawer" onClick={toggleDrawer} aria-label="close sidebar" className="drawer-overlay"></label>
                     <ul className="menu bg-base-200 min-h-full w-80 p-4">
                         {/* Sidebar */}
-                        <li><Link to="/staff">Staff</Link></li>
-                        <li><Link to="/assets">Assets</Link></li>
+                        <li onClick={toggleDrawer}><Link to="/staff">Staff</Link></li>
+                        <li onClick={toggleDrawer}><Link to="/assets">Assets</Link></li>
                     </ul>
                 </div>
             </div>

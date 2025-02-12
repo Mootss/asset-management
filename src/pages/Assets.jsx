@@ -69,6 +69,8 @@ export default function Assets() {
                                 lastReturnedDate={asset.last_returned_date === null ? (<p>-</p>) : (
                                     new Date(asset.last_returned_date).toLocaleDateString("en-GB")
                                 )}
+
+                                assetID={asset.id}
                             />
                         ))}
                     </AssetsTable>

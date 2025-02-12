@@ -31,7 +31,7 @@ export default function StaffCollapse({ staff }) {
         queryFn: () => fetchAPI({
             url: `/staff/${staff.national_id}/current`
         }),
-        staleTime: 1000 * 60 * 15
+        // staleTime: 1000 * 60 * 15
     })
 
     // const [assignedAssets, setAssignedAssets] = useState([])
@@ -53,7 +53,7 @@ export default function StaffCollapse({ staff }) {
                         name={staff.name}
                         NID={staff.national_id}
                         department={staff.department}
-                        avatarURL="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP4eCvAfwGYqMo7py3NDh6V0sNiK1R_15Htg&s" // generic avatar icon
+                        avatarURL="avatar.png" // generic avatar icon
                     />
                 }
 
